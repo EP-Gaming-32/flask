@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, abort, jsonify, session, redirect, url_for, flash
 from flask_wtf import FlaskForm
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from werkzeug.exceptions import HTTPException
@@ -21,6 +22,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] =\
 app.config['SQLALQUEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 """
 Modelos do Banco de Dados
@@ -49,6 +51,10 @@ Formularios e Rotas
 class nameForm(FlaskForm):
     name = StringField('Qual seu nome?', validators = [DataRequired()])
     submit = SubmitField('Enviar')
+
+@app.shell_context_processor
+def make_shell_context():
+    return dict(db=db, User=User, Role=Role)
 
 @app.route('/', methods =['GET', 'POST'])
 def index():
@@ -104,7 +110,4 @@ def user(name):
     return render_template('user.html', name = name)
 
 if __name__ == '__main__':
-    with app.app_context():
-        #cria as tabelas no banco de dados
-        db.create_all() 
     app.run(debug=True)
