@@ -1,9 +1,27 @@
 from flask import Flask, render_template, abort, jsonify
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired
 from werkzeug.exceptions import HTTPException
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'hard to guess string'
+
+class nameForm(FlaskForm):
+    name = StringField('Qual seu nome?', validators = [DataRequired()])
+    submit = SubmitField('Enviar')
+
+@app.route('/', methods =['GET', 'POST'])
+def index():
+    name = None
+    form = nameForm()
+    if form.validate_on_submit():
+        name = form.name.data
+        form.name.data = ''
+    data = datetime.now(ZoneInfo("America/Sao_Paulo"))
+    return render_template('index.html',form=form, name=name, data_formatada = data.strftime("%d/%m/%y %H:%M Fuso: %Z"))
 
 #controle dinamico de erros
 @app.errorhandler(HTTPException)
@@ -35,10 +53,6 @@ def test_error(code):
         # caso tenha erro na conversão de str -> int
         return jsonify({'erro': 'Código de status inválido, deve ser um número'}), 400
 
-@app.route('/')
-def index():
-    data = datetime.now(ZoneInfo("America/Sao_Paulo"))
-    return render_template('index.html', data_formatada = data.strftime("%d/%m/%y %H:%M Fuso: %Z"))
 
 @app.route('/user/<name>')
 #pode ser usado em crud para performar operacoes com base em id
