@@ -5,7 +5,15 @@
 {% block content %}
 <div class="flex flex-col items-center h-screen">
     <h1>Olá! {% if name %}{{ name }} {% else %} desconhecido {% endif %}</h1>
+
+    {% if not known  %}
+    <p>Prazer em conhece-lo!</p>
+    {% else %}
+    <p>Bem vindo de volta!</p>
+    {% endif %}
+
     <p>A data e hora local são: {{ data_formatada }}.</p>
+
     <form method="POST" class="flex flex-col items-center gap-4 mt-6">
     {{ form.hidden_tag() }}
 
@@ -13,6 +21,6 @@
     {{ form.name(class="border rounded-lg p-2 text-center") }}
 
     {{ form.submit(class="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 cursor-pointer") }}
-</form>
+    </form>
 </div>
 {% endblock %}
