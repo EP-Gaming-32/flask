@@ -1,5 +1,7 @@
 from flask import Flask, render_template, abort, jsonify
 from werkzeug.exceptions import HTTPException
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 app = Flask(__name__)
 
@@ -35,7 +37,8 @@ def test_error(code):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    data = datetime.now(ZoneInfo("America/Sao_Paulo"))
+    return render_template('index.html', data_formatada = data.strftime("%d/%m/%y %H:%M Fuso: %Z"))
 
 @app.route('/user/<name>')
 #pode ser usado em crud para performar operacoes com base em id
