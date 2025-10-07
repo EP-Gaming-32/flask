@@ -1,4 +1,4 @@
-from flask import Flask, render_template, abort, jsonify
+from flask import Flask, render_template, abort, jsonify, session, redirect, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
@@ -15,13 +15,12 @@ class nameForm(FlaskForm):
 
 @app.route('/', methods =['GET', 'POST'])
 def index():
-    name = None
     form = nameForm()
     if form.validate_on_submit():
-        name = form.name.data
-        form.name.data = ''
+        session['name'] = form.name.data
+        return redirect(url_for('index'))
     data = datetime.now(ZoneInfo("America/Sao_Paulo"))
-    return render_template('index.html',form=form, name=name, data_formatada = data.strftime("%d/%m/%y %H:%M Fuso: %Z"))
+    return render_template('index.html',form=form, name=session.get('name'), data_formatada = data.strftime("%d/%m/%y %H:%M Fuso: %Z"))
 
 #controle dinamico de erros
 @app.errorhandler(HTTPException)
